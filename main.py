@@ -16,3 +16,6 @@ if __name__ == "__main__":
 
     # Exercise 4: Visualize - Histograms / KDE plots + Correlation heatmap + Class distribution (sns.countplot)
     eda.plot_visualization()
+
+    # Exercise 5: Check for - Missing values (df.isnull().sum()) + Outliers (eg. boxplot, IQR)
+    eda.data_checks()
