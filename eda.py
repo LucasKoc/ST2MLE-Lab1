@@ -77,7 +77,6 @@ class EDA:
         print(self.X.head())
         print("----------------------------------")
 
-
     def plot_visualization(self) -> None:
         """
         Plot visualizations of the dataset.
