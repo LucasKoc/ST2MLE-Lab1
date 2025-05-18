@@ -134,6 +134,29 @@ class EDA:
         plt.tight_layout()
         plt.savefig(Config.DIR_EDA + "/boxplots.png")
 
+        # Check for outliers using IQR
+
+        lower_bound, upper_bound = self.outliers_iqr()
+        outliers = ((self.X < lower_bound) | (self.X > upper_bound)).sum()
+        print("----------------------------------")
+        print("Number of outliers in the dataset:")
+        print(outliers)
+        print("----------------------------------")
+
+    def outliers_iqr(self) -> (pd.Series, pd.Series):
+        """
+        Calculate the IQR and return the lower and upper bounds for outliers.
+        """
+        Q1 = self.X.quantile(0.25)
+        Q3 = self.X.quantile(0.75)
+
+        IQR: pd.Series = Q3 - Q1
+
+        lower_bound: pd.Series = Q1 - 1.5 * IQR
+        upper_bound: pd.Series = Q3 + 1.5 * IQR
+
+        return lower_bound, upper_bound
+
 
     def normalize_dataset(self) -> None:
         """
@@ -163,3 +186,14 @@ class EDA:
 
         self.X = self.X.drop_duplicates()
         print("Duplicates removed from the dataset.")
+
+
+    def remove_outliers(self) -> None:
+        """
+        Remove outliers from the dataset using IQR.
+        """
+        lower_bound, upper_bound = self.outliers_iqr()
+
+        # Remove outliers
+        self.X = self.X[~((self.X < lower_bound) | (self.X > upper_bound)).any(axis=1)]
+        print("Outliers removed from the dataset.")
