@@ -19,3 +19,18 @@ if __name__ == "__main__":
 
     # Exercise 5: Check for - Missing values (df.isnull().sum()) + Outliers (eg. boxplot, IQR)
     eda.data_checks()
+
+    # Exercise 6: Normalize and standardize numeric features (if you think it is needed)
+    # It's needed here because the features are not on the same scale
+
+    # Exercise 7: Summarize the different insights of the EDA phase: Are there issues with some features?
+    # High feature correlation ? Missing values ? Outliers ?
+
+    # Exercise 8: Take the necessary action(s) and justify.
+
+    # There is no missing values in the dataset.
+    # Remove duplicates:
+    eda.remove_duplicates()
+
+    # Remove outliers:
+

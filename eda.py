@@ -1,5 +1,6 @@
 import os
 
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
 import openml
 import pandas as pd
@@ -36,7 +37,7 @@ class EDA:
         """
         # Load the dataset from local repository
         self.dataset = openml.datasets.get_dataset(Config.DATASET_ID)
-        self.X, self.y, _, _ = self.dataset.get_data()
+        self.X, self.y, _, _ = self.dataset.get_data(target=self.dataset.default_target_attribute)
 
     def summary_table(self) -> pd.DataFrame:
         """
@@ -84,18 +85,17 @@ class EDA:
         2. Correlation heatmap
         3. Class distribution (sns.countplot)
         """
+
         # Histograms / KDE plots
         self.X.hist(figsize=(20, 15), bins=100)
         plt.suptitle("Histograms of the dataset", fontsize=20)
         plt.savefig(Config.DIR_EDA + "/histograms.png")
-        plt.show()
 
         # Correlation heatmap
         plt.figure(figsize=(20, 15))
         sns.heatmap(self.X.corr(), annot=True, fmt=".2f", cmap="coolwarm")
         plt.title("Correlation heatmap of the dataset", fontsize=20)
         plt.savefig(Config.DIR_EDA + "/correlation_heatmap.png")
-        plt.show()
 
         # Class distribution
         plt.figure(figsize=(20, 15))
@@ -103,7 +103,6 @@ class EDA:
         plt.title("Class distribution of the dataset", fontsize=20)
         plt.xticks(rotation=90)
         plt.savefig(Config.DIR_EDA + "/class_distribution.png")
-        plt.show()
 
     def data_checks(self) -> None:
         """
@@ -117,13 +116,7 @@ class EDA:
         print(self.X.isnull().sum())
         print("----------------------------------")
 
-        # Check for outliers using boxplot, display in separate subplots
-        """self.X.boxplot(figsize=(20, 15))
-        plt.suptitle("Boxplot of the dataset", fontsize=20)
-        plt.xticks(rotation=90)
-        plt.savefig(Config.DIR_EDA + "/boxplot.png")
-        plt.show()"""
-
+        # Check for outliers using boxplots
         n_cols = 7
         n_rows = (len(self.X.columns) + n_cols - 1) // n_cols
 
@@ -134,9 +127,39 @@ class EDA:
             sns.boxplot(y=self.X[col], ax=axes[i])
             axes[i].set_title(f"Boxplot of {col}")
 
+        # Remove empty subplots
         for j in range(i + 1, len(axes)):
             fig.delaxes(axes[j])
 
         plt.tight_layout()
         plt.savefig(Config.DIR_EDA + "/boxplots.png")
-        plt.show()
+
+
+    def normalize_dataset(self) -> None:
+        """
+        Normalize the dataset using MinMaxScaler.
+        """
+        scaler = MinMaxScaler()
+        self.X = pd.DataFrame(scaler.fit_transform(self.X), columns=self.X.columns)
+        print("Dataset normalized using MinMaxScaler.")
+
+    def standardize_dataset(self) -> None:
+        """
+        Standardize the dataset using StandardScaler.
+        """
+        scaler = StandardScaler()
+        self.X = pd.DataFrame(scaler.fit_transform(self.X), columns=self.X.columns)
+        print("Dataset standardized using StandardScaler.")
+
+
+    def remove_duplicates(self) -> None:
+        """
+        Remove duplicates lines from the dataset.
+        """
+        print("--------------------------------")
+        print("Number of duplicate lines in the dataset:")
+        print(self.X.duplicated().sum())
+        print("--------------------------------")
+
+        self.X = self.X.drop_duplicates()
+        print("Duplicates removed from the dataset.")
