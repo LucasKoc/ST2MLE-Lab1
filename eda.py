@@ -1,10 +1,10 @@
 import os
 
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import matplotlib.pyplot as plt
 import openml
 import pandas as pd
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from config import Config
 
@@ -157,7 +157,6 @@ class EDA:
 
         return lower_bound, upper_bound
 
-
     def normalize_dataset(self) -> None:
         """
         Normalize the dataset using MinMaxScaler.
@@ -174,7 +173,6 @@ class EDA:
         self.X = pd.DataFrame(scaler.fit_transform(self.X), columns=self.X.columns)
         print("Dataset standardized using StandardScaler.")
 
-
     def remove_duplicates(self) -> None:
         """
         Remove duplicates lines from the dataset.
@@ -186,7 +184,6 @@ class EDA:
 
         self.X = self.X.drop_duplicates()
         print("Duplicates removed from the dataset.")
-
 
     def remove_outliers(self) -> None:
         """
