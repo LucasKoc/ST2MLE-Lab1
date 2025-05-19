@@ -1,9 +1,11 @@
 import os
 
 import matplotlib.pyplot as plt
+import numpy as np
 import openml
 import pandas as pd
 import seaborn as sns
+from openml import OpenMLDataset
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 
 from config import Config
@@ -22,8 +24,17 @@ def create_assets_folder() -> None:
 
 
 class EDA:
+    """
+    Class for Exploratory Data Analysis (EDA) on a dataset.
+    """
+
     def __init__(self):
-        self.dataset = None
+        """
+        Initialize the EDA class.
+
+        On initialization, assets folders are created if they don't exist, following Config class.
+        """
+        self.dataset: OpenMLDataset | None = None
         self.X: pd.DataFrame = pd.DataFrame()
         self.y: pd.Series = pd.Series()
 
@@ -68,17 +79,7 @@ class EDA:
         print(self.X.describe().to_markdown())
         print("----------------------------------")
 
-        print("----------------------------------")
-        print("\nSummary statistics of the target variable:")
-        print(self.X.info())
-        print("----------------------------------")
-
-        print("----------------------------------")
-        print("\nFirst 5 rows of the dataset:")
-        print(self.X.head())
-        print("----------------------------------")
-
-    def plot_visualization(self) -> None:
+    def plot_visualization(self, file_name_suffix="") -> None:
         """
         Plot visualizations of the dataset.
         1. Histograms / KDE plots
@@ -86,25 +87,26 @@ class EDA:
         3. Class distribution (sns.countplot)
         """
 
-        # Histograms / KDE plots
-        self.X.hist(figsize=(20, 15), bins=100)
+        # Histograms
+        self.X[sorted(self.X.columns)].hist(figsize=(20, 15), bins=100)
         plt.suptitle("Histograms of the dataset", fontsize=20)
-        plt.savefig(Config.DIR_EDA + "/histograms.png")
+        plt.tight_layout(pad=1)
+        plt.savefig(Config.DIR_EDA + f"/histograms{file_name_suffix}.png")
 
         # Correlation heatmap
         plt.figure(figsize=(20, 15))
-        sns.heatmap(self.X.corr(), annot=True, fmt=".2f", cmap="coolwarm")
+        sns.heatmap(self.X[sorted(self.X.columns)].corr(), annot=True, fmt=".2f", cmap="coolwarm")
         plt.title("Correlation heatmap of the dataset", fontsize=20)
-        plt.savefig(Config.DIR_EDA + "/correlation_heatmap.png")
+        plt.savefig(Config.DIR_EDA + f"/correlation_heatmap{file_name_suffix}.png")
 
         # Class distribution
         plt.figure(figsize=(20, 15))
         sns.countplot(x=self.y, data=self.X)
         plt.title("Class distribution of the dataset", fontsize=20)
         plt.xticks(rotation=90)
-        plt.savefig(Config.DIR_EDA + "/class_distribution.png")
+        plt.savefig(Config.DIR_EDA + f"/class_distribution{file_name_suffix}.png")
 
-    def data_checks(self) -> None:
+    def data_checks(self, file_name_suffix="") -> None:
         """
         Checks:
         1. Missing values (df.isnull().sum())
@@ -132,7 +134,7 @@ class EDA:
             fig.delaxes(axes[j])
 
         plt.tight_layout()
-        plt.savefig(Config.DIR_EDA + "/boxplots.png")
+        plt.savefig(Config.DIR_EDA + f"/boxplots{file_name_suffix}.png")
 
         # Check for outliers using IQR
 
@@ -194,3 +196,17 @@ class EDA:
         # Remove outliers
         self.X = self.X[~((self.X < lower_bound) | (self.X > upper_bound)).any(axis=1)]
         print("Outliers removed from the dataset.")
+
+    def drop_highly_correlated_features(self, threshold: float = 0.9) -> None:
+        """
+        Drop highly correlated features from the dataset.
+        """
+        to_drop = ['HALSTEAD_ERROR_EST', 'HALSTEAD_LENGTH', 'HALSTEAD_PROG_TIME', 'HALSTEAD_VOLUME']
+        self.X = self.X.drop(columns=to_drop)
+        print(f"Dropped highly correlated features: {to_drop}")
+
+    def export_eda_members(self) -> (pd.DataFrame, pd.Series):
+        """
+        Export the dataset members (X and y).
+        """
+        return self.X, self.y

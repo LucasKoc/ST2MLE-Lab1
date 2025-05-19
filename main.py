@@ -1,7 +1,9 @@
 from eda import EDA
 
 if __name__ == "__main__":
+    ####################################################################################
     # Part 1 - EDA (Exploratory Data Analysis)
+    ####################################################################################
     eda = EDA()
 
     # Exercise 1: Load the dataset
@@ -21,7 +23,7 @@ if __name__ == "__main__":
     eda.data_checks()
 
     # Exercise 6: Normalize and standardize numeric features (if you think it is needed)
-    # It's needed here because the features are not on the same scale
+    # Normalize and standardize numeric features
 
     # Exercise 7: Summarize the different insights of the EDA phase: Are there issues with some features?
     # High feature correlation ? Missing values ? Outliers ?
@@ -31,5 +33,22 @@ if __name__ == "__main__":
     # There is no missing values in the dataset.
     # Remove duplicates:
     eda.remove_duplicates()
+    # Remove outlines:
+    eda.remove_outliers()
 
-    # Remove outliers:
+    eda.plot_visualization(file_name_suffix="_post_duplicate_and_outliner_removal")
+    eda.data_checks(file_name_suffix="_post_duplicate_and_outliner_removal")
+
+    # Drop highly correlated features
+    eda.drop_highly_correlated_features()
+
+    eda.plot_visualization(file_name_suffix="_post_highly_correlated_features_removal")
+    eda.data_checks(file_name_suffix="_post_highly_correlated_features_removal")
+
+    # Save eda members
+    X, y = eda.export_eda_members()
+
+    ####################################################################################
+    # Part 2: Train-Test Split and Baseline Model
+    ####################################################################################
+    # Exercise 1: Split the dataset into train and test sets (80% train, 20% test)
