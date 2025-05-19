@@ -1,8 +1,6 @@
 import pandas as pd
 from imblearn.over_sampling import SMOTE
-from matplotlib import pyplot as plt
 from sklearn.metrics import (
-    ConfusionMatrixDisplay,
     accuracy_score,
     classification_report,
     confusion_matrix,

@@ -1,3 +1,5 @@
+from numpy.f2py.symbolic import normalize
+
 from classification_models import Classification_models
 from eda import EDA
 from train_test_model import Train_Test_Model
@@ -84,10 +86,24 @@ if __name__ == "__main__":
     ####################################################################################
     # Part 4: Classificaiton Models (7 exercices)
     ####################################################################################
+
     classification_model = Classification_models(X_train, y_train, X_test, y_test)
     # Exercise 1: Decision Tree (baseline)
-    # Use DecisionTreeClassifier from sklearn.tree
+    classification_model.decision_tree()
 
-    # Report metrics (confusion matrix, precision, recall, F1)
+    # Exercise 2: Decision Tree with Pre-Pruning
+    classification_model.decision_tree_with_pre_pruning()
 
-    # Analyze and discuss the results
+    # Exercise 3: Post-Pruning
+    classification_model.post_pruning()
+
+    # Exercise 4: Naive Bayes
+    classification_model.naive_bayes()
+
+    # Exercise 5: Random Forest
+    classification_model.random_forest()
+
+    # Exercise 6: Boosting (AdaBoost, GradientBoosting and XGBoost)
+    classification_model.boosting()
+
+    # Exercise 7: Stacking

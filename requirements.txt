@@ -5,6 +5,7 @@ seaborn
 matplotlib
 imbalanced-learn
 openml
+xgboost
 
 tabulate
 
