@@ -4,14 +4,20 @@ import time
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.ensemble import (
+    AdaBoostClassifier,
+    GradientBoostingClassifier,
+    RandomForestClassifier,
+    StackingClassifier,
+)
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.naive_bayes import GaussianNB
 from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 from config import Config
-from xgboost import XGBClassifier
 
 
 def create_assets_folder() -> None:
@@ -63,7 +69,7 @@ class Classification_models:
         print(confusion_matrix(self.y_test, self.model.predict(self.X_test)))
         print("----------------------------------")
 
-    def decision_tree_with_pre_pruning(self) -> None:
+    def decision_tree_with_pre_pruning(self) -> DecisionTreeClassifier:
         """
         Decision Tree Classifier with Pre-Pruning
         Use GridSearchCV (with 5 folds) to tune max_depth, min_samples_split. Try with max_depth
@@ -85,6 +91,7 @@ class Classification_models:
         print("Best score found: ", grid_search.best_score_)
 
         self.performance_evaluation()
+        return self.model
 
     def post_pruning(self) -> None:
         """
@@ -138,7 +145,7 @@ class Classification_models:
         self.model = model
         self.performance_evaluation()
 
-    def random_forest(self) -> None:
+    def random_forest(self) -> RandomForestClassifier:
         """
         Use RandomForestClassifier (with n_estimators=100)
         Plot the feature importance and discuss the results
@@ -164,7 +171,9 @@ class Classification_models:
         plt.savefig(f"{Config.DIR_MODELS}/random_forest_feature_importance.png")
         plt.close()
 
-    def boosting(self) -> None:
+        return model
+
+    def boosting(self) -> tuple[AdaBoostClassifier, GradientBoostingClassifier, XGBClassifier]:
         """
         Try AdaBoostClassifier (with n_estimators=100)
         GradientBoostingClassifier (with n_estimators=100)
@@ -183,6 +192,7 @@ class Classification_models:
         print(f"Training time for GradientBoosting: {gboost_time:.2f} seconds")
         print(f"Training time for XGBoost: {xgboost_time:.2f} seconds")
 
+        return ada, gboost, xgboost
 
     def train_boost(self, model) -> float:
         """
@@ -197,3 +207,25 @@ class Classification_models:
         self.performance_evaluation()
 
         return training_time
+
+    def stacking(self, model_dt_pre_pruning, model_random_forest, model_gradientboosting) -> None:
+        """
+        Use StackingClassifier with the previous top 3 performing models as base learners: (1) the
+        pre-pruned decision tree with the optimal hyper-parameters, (2) the random forest and the
+        (3) Gradient boosting. Use LogisticRegression as the meta learner.
+        Evaluate performance
+        """
+        base_learners = [
+            ("dt", model_dt_pre_pruning),
+            ("rf", model_random_forest),
+            ("gb", model_gradientboosting),
+        ]
+        meta_learner = LogisticRegression(random_state=Config.RANDOM_STATE)
+
+        stacking_model = StackingClassifier(
+            estimators=base_learners, final_estimator=meta_learner, cv=5, n_jobs=-1
+        )
+
+        stacking_model.fit(self.X_train, self.y_train)
+        self.model = stacking_model
+        self.performance_evaluation()

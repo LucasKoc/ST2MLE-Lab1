@@ -92,7 +92,7 @@ if __name__ == "__main__":
     classification_model.decision_tree()
 
     # Exercise 2: Decision Tree with Pre-Pruning
-    classification_model.decision_tree_with_pre_pruning()
+    model_dt_pre_pruning = classification_model.decision_tree_with_pre_pruning()
 
     # Exercise 3: Post-Pruning
     classification_model.post_pruning()
@@ -101,9 +101,10 @@ if __name__ == "__main__":
     classification_model.naive_bayes()
 
     # Exercise 5: Random Forest
-    classification_model.random_forest()
+    model_random_forest = classification_model.random_forest()
 
     # Exercise 6: Boosting (AdaBoost, GradientBoosting and XGBoost)
-    classification_model.boosting()
+    model_adaboost, model_gradientboosting, model_xgboost = classification_model.boosting()
 
     # Exercise 7: Stacking
+    classification_model.stacking(model_dt_pre_pruning, model_random_forest, model_gradientboosting)
