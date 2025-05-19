@@ -184,7 +184,9 @@ class EDA:
         print(self.X.duplicated().sum())
         print("--------------------------------")
 
-        self.X = self.X.drop_duplicates()
+        mask = self.X.duplicated(keep="first")
+        self.X = self.X[~mask]
+        self.y = self.y[~mask]
         print("Duplicates removed from the dataset.")
 
     def remove_outliers(self) -> None:
@@ -194,10 +196,12 @@ class EDA:
         lower_bound, upper_bound = self.outliers_iqr()
 
         # Remove outliers
-        self.X = self.X[~((self.X < lower_bound) | (self.X > upper_bound)).any(axis=1)]
+        mask = ~((self.X < lower_bound) | (self.X > upper_bound)).any(axis=1)
+        self.X = self.X.loc[mask]
+        self.y = self.y.loc[mask]
         print("Outliers removed from the dataset.")
 
-    def drop_highly_correlated_features(self, threshold: float = 0.9) -> None:
+    def drop_highly_correlated_features(self) -> None:
         """
         Drop highly correlated features from the dataset.
         """

@@ -1,4 +1,6 @@
+from classification_models import Classification_models
 from eda import EDA
+from train_test_model import Train_Test_Model
 
 if __name__ == "__main__":
     ####################################################################################
@@ -51,4 +53,41 @@ if __name__ == "__main__":
     ####################################################################################
     # Part 2: Train-Test Split and Baseline Model
     ####################################################################################
+    train_test_model = Train_Test_Model(X, y)
+
     # Exercise 1: Split the dataset into train and test sets (80% train, 20% test)
+    train_test_model.split_dataset()
+
+    # Exercise 2: Train a baseline Decision Tree.
+    # Exercise 3: Report accuracy on both train and test sets.
+    train_test_model.train_baseline_decision_tree()
+
+    # Exercise 4: Report precision, recall, F1 and the confusion matrix on the test set
+    train_test_model.report_metrics()
+
+    # Exercise 5: Any issue of overfitting ? Underfitting ? Other issues ?
+
+    ####################################################################################
+    # Part 3: Resampling with SMOTE
+    ####################################################################################
+    # Exercise 1: Based on the class distribution, do we need under-sampling or oversampling? Justify your choice.
+
+    # Exercise 2: Apply SMOTE using the imblearn.over_sampling module.
+    # Exercise 3: Show class distribution before and after.
+    train_test_model.oversample_dataset()
+
+    # Exercise 4: Is there any risk with SMOTE? Data leakage ?
+
+    # Exercise 5: Are there other oversampling methods?
+
+    X_train, y_train, X_test, y_test = train_test_model.export_members()
+    ####################################################################################
+    # Part 4: Classificaiton Models (7 exercices)
+    ####################################################################################
+    classification_model = Classification_models(X_train, y_train, X_test, y_test)
+    # Exercise 1: Decision Tree (baseline)
+    # Use DecisionTreeClassifier from sklearn.tree
+
+    # Report metrics (confusion matrix, precision, recall, F1)
+
+    # Analyze and discuss the results
